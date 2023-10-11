@@ -1,4 +1,4 @@
-@use '../../style' as s;
+@use '../../style/index.scss' as s;
 
 main {
 	background: s.color(dark);

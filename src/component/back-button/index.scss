@@ -1,0 +1,5 @@
+@use '../../style/index.scss' as s;
+
+.back-button {
+	@include s.click;
+}

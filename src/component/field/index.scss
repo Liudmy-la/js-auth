@@ -1,0 +1,42 @@
+@use '../../style/index.scss' as s;
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: s.space(2);
+
+	&__label {
+		font-size: 14px;
+		color: s.color('dark');
+	}
+
+	&__input {
+		border: 1px solid s.color('light');
+		background-color: s.color('light');
+
+		padding: s.space(4);
+		border-radius: 10px;
+
+		font-size: 14px;
+
+		&::placeholder {
+			color: grey;
+		}
+
+		color: s.color('dark');
+
+		transition: border-color 0.3s;
+
+		&:hover {
+			border-color: s.color('main');
+		}
+
+		&:focus {
+			border-color: s.color('main');
+		}
+
+		&--error {
+			border-color: red !important;
+		}
+	}
+}
