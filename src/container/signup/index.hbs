@@ -18,6 +18,11 @@
 			</div>
 			
 			<div class="form__item">
+				{{> field-password action="signupForm.change" label="Repeat Password" name="passwordAgain"  placeholder="Put Your Password"}}
+				<span name="passwordAgain" class="form__error">Помилка</span>
+			</div>
+			
+			<div class="form__item">
 				{{> field-select action="signupForm.change" label="Role" name="role"  placeholder="Choose Your Role" list=data.role}}
 				<span name="role" class="form__error">Помилка</span>
 			</div>
@@ -28,8 +33,8 @@
 			</div>
 		</div>
 
-		<button onclick="signupForm.submit()" class="button" type="button">Зареєструватися</button>
+		<button onclick="signupForm.submit()" class="button button--disabled" type="button">Зареєструватися</button>
 
-		<span class="alert alert--error">Увага, Помилка!</span>
+		<span class="alert alert--error alert--disabled">Повідомлення про стан </span>
 	</form>
-</div>
+</div> 
