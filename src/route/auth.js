@@ -5,6 +5,7 @@ const router = express.Router()
 
 const { User } = require('../class/user')
 const { Confirm } = require('../class/confirm')
+const { Session } = require('../class/session')
 
 User.create({
   email: 'testmail@mail.com',
@@ -59,8 +60,6 @@ router.get('/signup', function (req, res) {
 router.post('/signup', function (req, res) {
   const { email, password, role } = req.body
 
-  //   console.log(req.body)
-
   if (!email || !password || !role) {
     return res.status(400).json({
       message: `Помилка. Обов'язкові поля відсутні.`,
@@ -76,10 +75,14 @@ router.post('/signup', function (req, res) {
       })
     }
 
-    User.create({ email, password, role })
+    const newUser = User.create({ email, password, role })
+    const session = Session.create(newUser)
+
+    Confirm.create(newUser.email)
 
     return res.status(200).json({
       message: `Користувач успішно зареєстрований.`,
+      session,
     })
   } catch (err) {
     return res.status(400).json({
@@ -200,8 +203,11 @@ router.post('/recovery-confirm', function (req, res) {
     user.password = password
     console.log(user)
 
+    const session = Session.create(user)
+
     return res.status(200).json({
       message: 'Пароль змінено!',
+      session,
     })
   } catch (err) {
     return res.status(400).json({
@@ -212,5 +218,122 @@ router.post('/recovery-confirm', function (req, res) {
 
 // ================================================================
 
+router.get('/signup-confirm', function (req, res) {
+  const { renew, email } = req.body
+
+  if (renew) {
+    Confirm.create(email)
+  }
+
+  return res.render('signup-confirm', {
+    name: 'signup-confirm',
+    component: ['back-button', 'field'],
+    title: 'Signup Confirm Page',
+
+    data: {},
+  })
+})
+
+// ================================================================
+
+router.post('/signup-confirm', function (req, res) {
+  const { code, token } = req.body
+
+  if (!code || !token) {
+    return res.status(400).json({
+      message: `Помилка. Обов'язкові поля відсутні.`,
+    })
+  }
+
+  try {
+    const session = Session.get(token)
+    if (!session) {
+      return res.status(400).json({
+        message: `Помилка. Ви не увійшли в аккаунт`,
+      })
+    }
+
+    const email = Confirm.getData(code)
+    if (!email) {
+      return res.status(400).json({
+        message: `Помилка. Код не існує`,
+      })
+    }
+
+    if (email !== session.user.email) {
+      return res.status(400).json({
+        message: `Помилка. Код не дійсний`,
+      })
+    }
+
+    const user = User.getByEmail(session.user.email)
+    user.isConfirm = true
+    session.user.isConfirm = true
+
+    return res.status(200).json({
+      message: `Ви підтвердили свою пошту`,
+      session,
+    })
+  } catch (err) {
+    return res.status(400).json({
+      message: err.message,
+    })
+  }
+
+  console.log(code, token)
+})
+
+// ================================================================
+
+router.get('/login', function (req, res) {
+  return res.render('login', {
+    name: 'login',
+    component: ['back-button', 'field', 'field-password'],
+    title: 'Login Page',
+
+    data: {},
+  })
+})
+
+// ================================================================
+
+router.post('/login', function (req, res) {
+  const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: `Помилка. Обов'язкові поля відсутні.`,
+    })
+  }
+
+  try {
+    const user = User.getByEmail(email)
+
+    if (!user) {
+      return res.status(400).json({
+        message: `Помилка. Такий користувач не існує.`,
+      })
+    }
+
+    if (user.password !== password) {
+      return res.status(400).json({
+        message: `Помилка. Пароль не підходить.`,
+      })
+    }
+
+    const session = Session.create(user)
+
+    return res.status(200).json({
+      message: `Ви увійшли!`,
+      session,
+    })
+  } catch (err) {
+    return res.status(400).json({
+      message: err.message,
+    })
+  }
+})
+
+// ================================================================
 // Підключаємо роутер до бек-енду
 module.exports = router
