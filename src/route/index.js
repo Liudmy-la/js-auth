@@ -43,10 +43,12 @@ router.get('/logout', function (req, res) {
 // Підключіть файли роутів
 // Підключіть інші файли роутів, якщо є
 const auth = require('./auth')
+const user = require('./user')
 
 // Об'єднайте файли роутів за потреби
 // Використовуйте інші файли роутів, якщо є
 router.use('/', auth)
+router.use('/', user)
 
 // Експортуємо глобальний роутер
 module.exports = router

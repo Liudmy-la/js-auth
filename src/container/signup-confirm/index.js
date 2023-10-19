@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (e) {}
 
   document
-    .querySelector('#renew')
+    .querySelector('.link#renew')
     .addEventListener('click', (e) => {
       e.preventDefault()
 

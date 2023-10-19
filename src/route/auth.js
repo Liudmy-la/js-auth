@@ -8,9 +8,21 @@ const { Confirm } = require('../class/confirm')
 const { Session } = require('../class/session')
 
 User.create({
-  email: 'testmail@mail.com',
+  email: 'usermail@mail.com',
   password: 123,
   role: 1,
+})
+
+User.create({
+  email: 'adminmail@mail.com',
+  password: 456,
+  role: 2,
+})
+
+User.create({
+  email: 'devmail@mail.com',
+  password: 789,
+  role: 3,
 })
 // ================================================================
 
@@ -219,11 +231,13 @@ router.post('/recovery-confirm', function (req, res) {
 // ================================================================
 
 router.get('/signup-confirm', function (req, res) {
-  const { renew, email } = req.body
+  const { renew, email } = req.query
 
   if (renew) {
     Confirm.create(email)
   }
+
+  console.log(renew, email)
 
   return res.render('signup-confirm', {
     name: 'signup-confirm',
